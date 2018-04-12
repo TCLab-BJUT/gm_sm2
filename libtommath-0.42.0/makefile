@@ -23,7 +23,7 @@ CFLAGS += -O3 -funroll-loops
 CFLAGS  += -fomit-frame-pointer
 
 #debug
-#CFLAGS += -g3
+CFLAGS += -g3
 
 endif
 

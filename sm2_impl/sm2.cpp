@@ -46,10 +46,14 @@ const char * Yg     = SM2_G_Y;
 #include "sm3.h"
 #include "tommath.h"
 #include "stdio.h"
+#include "fcntl.h"
+#include "unistd.h"
 #include "stdlib.h"
 #include "string.h"
 #include "GM_define.h"
-#include "time.h"
+//#include "time.h"
+#include <errno.h>
+#include <sys/types.h>
 
 
 int myrng(unsigned char *dst, int len, void *dat)
@@ -1044,6 +1048,31 @@ END:
  */
 int genRand_k(mp_int * rand_k, mp_int * mp_n)
 {
+     int i;
+     int is_small;
+     int fd=open("/dev/urandom",O_RDONLY);
+     if(fd<0)
+	return -EIO;
+     rand_k->alloc=mp_n->alloc;
+     rand_k->sign=mp_n->sign;
+     rand_k->used=0;
+     rand_k->dp=(mp_digit *)malloc(sizeof(mp_digit)*rand_k->alloc);
+     if(rand_k->dp==NULL)
+	return -ENOMEM;
+     read(fd,rand_k->dp,sizeof(mp_digit)*mp_n->used);
+     rand_k->used=mp_n->used;
+     while(rand_k->used>0)
+     {
+        if(rand_k->dp[rand_k->used-1]!=0)
+		break;
+	    rand_k->used--;	
+     }
+     if(rand_k->used==mp_n->used)
+     {
+          rand_k->dp[rand_k->used-1]%=mp_n->dp[mp_n->used-1];
+     }
+     return 0;	
+/*
 	int ret = 0;
 	srand( (unsigned)time( NULL ) );
 	mp_set(rand_k, 1);
@@ -1056,6 +1085,7 @@ int genRand_k(mp_int * rand_k, mp_int * mp_n)
 
 END:
     return ret;
+*/
 }
 		
 
