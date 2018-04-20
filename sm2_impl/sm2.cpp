@@ -1,4 +1,4 @@
-
+#include<time.h>
 
 /*
  * sm2 implimentation based upon libTomMath library and goldbar's sm3 project
@@ -946,9 +946,11 @@ int GM_SM2Sign(unsigned char * signedData, unsigned long * pulSigLen,
 	//////////////////////////////////////////////////////////////////////////
 	mp_int mp_rand_k;
 	mp_init_set(&mp_rand_k, 1);
+/*
 #ifdef _DEBUG
 	unsigned char rand_k[] = "6CB28D99385C175C94F94E934817663FC176D925DD72B727260DBAAE1FB2F96F";
 #endif
+*/
 	//////////////////////////////////////////////////////////////////////////
 
 	unsigned char dgst[32] = {0};
@@ -1001,7 +1003,7 @@ int GM_SM2Sign(unsigned char * signedData, unsigned long * pulSigLen,
 	printf("digest=");
 	MP_print(&mp_dgst);
 #endif
-
+/*
 #ifdef _DEBUG
 	///  get rand num
 	ret = mp_read_radix(&mp_rand_k, (char *) rand_k, 16);
@@ -1012,9 +1014,10 @@ int GM_SM2Sign(unsigned char * signedData, unsigned long * pulSigLen,
 	printf("rand_k=");
 	MP_print(&mp_rand_k);
 #else
+*/
 	ret = genRand_k(&mp_rand_k, &mp_n);
 	CHECK_RET(ret);
-#endif // _DEBUG
+//#endif // _DEBUG
 	ret = Ecc_Sm2_sign(&mp_r, &mp_s, &mp_dgst, &mp_rand_k, 
 		&mp_pri_dA, &mp_Xg, &mp_Yg, &mp_a, &mp_p, &mp_n);
 	CHECK_RET(ret);
@@ -1048,6 +1051,8 @@ END:
  */
 int genRand_k(mp_int * rand_k, mp_int * mp_n)
 {
+
+     int ret = 0;
      int i;
      int is_small;
      int fd=open("/dev/urandom",O_RDONLY);
@@ -1059,33 +1064,36 @@ int genRand_k(mp_int * rand_k, mp_int * mp_n)
      rand_k->dp=(mp_digit *)malloc(sizeof(mp_digit)*rand_k->alloc);
      if(rand_k->dp==NULL)
 	return -ENOMEM;
-     read(fd,rand_k->dp,sizeof(mp_digit)*mp_n->used);
      rand_k->used=mp_n->used;
+     read(fd,rand_k->dp,sizeof(mp_digit)*rand_k->alloc);
+
+
      while(rand_k->used>0)
      {
         if(rand_k->dp[rand_k->used-1]!=0)
 		break;
 	    rand_k->used--;	
      }
-     if(rand_k->used==mp_n->used)
-     {
-          rand_k->dp[rand_k->used-1]%=mp_n->dp[mp_n->used-1];
-     }
-     return 0;	
 /*
 	int ret = 0;
+
 	srand( (unsigned)time( NULL ) );
 	mp_set(rand_k, 1);
-    for (int i = 0; i < 3; ++i) {
+    for (int i = 0; i < 5; ++i) {
         ret = mp_mul_d(rand_k, rand(), rand_k);
         CHECK_RET(ret);
     }
 	ret = mp_submod(rand_k, mp_n, mp_n, rand_k);
 	CHECK_RET(ret);
 
+        ret=mp_rand(rand_k,20);
+*/
+	ret = mp_submod(rand_k, mp_n, mp_n, rand_k);
+	CHECK_RET(ret);
+
 END:
     return ret;
-*/
+
 }
 		
 

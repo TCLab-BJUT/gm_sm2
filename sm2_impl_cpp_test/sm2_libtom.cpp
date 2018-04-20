@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
 
 // 	ret = test_Ecc_Intrfs_sig_veri();
 // 	ret = test_SM3_withZ_value_process();
- 	ret = test_GM_encryption_and_decryption();
+// 	ret = test_GM_encryption_and_decryption();
  	ret = test_GM_signature_and_verify();
 // 	ret = test_gen_SM2_GM_keypair();
 
