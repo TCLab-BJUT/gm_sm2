@@ -2,7 +2,7 @@
 
 LIBNAME=libsm2So.so
 OBJECTS=sm2.o sm3.o sm2_Intrfs_test.o
-CC=g++
+CC=gcc
 CPP=g++
 
 CFLAGS  =  -I./ -fPIC  -g #-D_DEBUG
@@ -11,10 +11,10 @@ all: $(LIBNAME)
 
 
 $(LIBNAME):  $(OBJECTS)
-	$(CPP) $(CFLAGS)  $(OBJECTS) ../libtommath-0.42.0/libtommath.a -shared -o $(LIBNAME) -ldl
+	$(CC) $(CFLAGS)  $(OBJECTS) ../libtommath-0.42.0/libtommath.a -shared -o $(LIBNAME) -ldl
 
 .cpp.o:
-	$(CPP) $(CFLAGS) $< -o $@ -c
+	$(CC) $(CFLAGS) $< -o $@ -c
 .c.o:
 	$(CC) $(CFLAGS) $< -o $@ -c 
 

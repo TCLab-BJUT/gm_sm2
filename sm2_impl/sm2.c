@@ -723,7 +723,8 @@ int Sm3WithPreprocess(unsigned char * dgst, unsigned long * LenDgst,
 	if (ret) goto END;
 	
 	lenZA_SRC = Len_ENTL_buf + lenUID + lenParamA + lenParamB + lenParamXg + lenParamYg + lenParamXA + lenParamYA;
-	ZA_SRC_Buff = new unsigned char [lenZA_SRC + MAX_STRLEN] ;
+//	ZA_SRC_Buff = new unsigned char [lenZA_SRC + MAX_STRLEN] ;
+	ZA_SRC_Buff = malloc(lenZA_SRC + MAX_STRLEN) ;
 	if (NULL == ZA_SRC_Buff)
 	{
 		ret =  ERR_MEM_ALLOC;
@@ -740,7 +741,8 @@ int Sm3WithPreprocess(unsigned char * dgst, unsigned long * LenDgst,
 	memcpy(ZA_SRC_Buff+Len_ENTL_buf+lenUID+lenParamA+lenParamB+lenParamXg+lenParamYg+lenParamXA, uzParam_YA, lenParamYA);
 
 	sm3(ZA_SRC_Buff, lenZA_SRC, ZA);
-	pM_A = new unsigned char[32+lenSrc+MAX_STRLEN];
+//	pM_A = new unsigned char[32+lenSrc+MAX_STRLEN];
+	pM_A = malloc(32+lenSrc+MAX_STRLEN);
 	if (NULL == pM_A)
 	{
 		ret =  ERR_MEM_ALLOC;
@@ -764,11 +766,13 @@ int Sm3WithPreprocess(unsigned char * dgst, unsigned long * LenDgst,
 END:
 	if (NULL != pM_A)
 	{
-		delete []pM_A;
+		//delete []pM_A;
+		free(pM_A);
 	}
 	if (NULL != ZA_SRC_Buff)
 	{
-		delete []ZA_SRC_Buff;
+		//delete []ZA_SRC_Buff;
+		free (ZA_SRC_Buff);
 	}
 	return ret;
 }
@@ -784,7 +788,8 @@ END:
 int Byte2Mp_Int(mp_int * mp_tar, unsigned char *src_byte, unsigned long lenSrc)
 {
 	char *src_strbuff = NULL;
-	src_strbuff = new char [lenSrc*2 + MAX_STRLEN];
+	//src_strbuff = new char [lenSrc*2 + MAX_STRLEN];
+	src_strbuff = malloc(lenSrc*2 + MAX_STRLEN);
 	if (NULL == src_strbuff)
 	{
 		return ERR_MEM_ALLOC;
@@ -818,7 +823,8 @@ int Byte2Mp_Int(mp_int * mp_tar, unsigned char *src_byte, unsigned long lenSrc)
 
 	if (NULL != src_strbuff)
 	{
-		delete src_strbuff;
+		//delete src_strbuff;
+		free(src_strbuff);
 	}
 	return ret ;
 }
@@ -1106,7 +1112,8 @@ int KDFwithSm3(unsigned char * kdfOutBuff, unsigned char * Z_in, unsigned long u
 		return ERR_PARAM;
 	}
 	
-	unsigned char * pZandCt = new unsigned char [ulZlen + 4 + 10];
+	//unsigned char * pZandCt = new unsigned char [ulZlen + 4 + 10];
+	unsigned char * pZandCt = malloc(ulZlen + 4 + 10);
 	if (NULL == pZandCt)
 	{
 		return ERR_MEM_ALLOC;
@@ -1134,7 +1141,8 @@ int KDFwithSm3(unsigned char * kdfOutBuff, unsigned char * Z_in, unsigned long u
 		{
 			if (NULL != pZandCt)
 			{
-				delete []pZandCt;
+				//delete pZandCt;
+				free( pZandCt);
 			}
 			return ret;
 		}
@@ -1151,7 +1159,8 @@ int KDFwithSm3(unsigned char * kdfOutBuff, unsigned char * Z_in, unsigned long u
 	{
 		if (NULL != pZandCt)
 		{
-			delete []pZandCt;
+			//delete pZandCt;
+			free( pZandCt);
 		}
 		return ret;
 	}
@@ -1165,7 +1174,8 @@ int KDFwithSm3(unsigned char * kdfOutBuff, unsigned char * Z_in, unsigned long u
 
 	if (NULL != pZandCt)
 	{
-		delete []pZandCt;
+		//delete pZandCt;
+		free(pZandCt);
 	}
 
 	
@@ -1324,7 +1334,8 @@ int GM_SM2Decrypt(unsigned char * DecData, unsigned long * ulDecDataLen, unsigne
 	CHECK_RET(ret);
 	
 
-	pC2 = new unsigned char[C2_len+10];
+	//pC2 = new unsigned char[C2_len+10];
+	pC2 = malloc(C2_len+10);
 	if (NULL == pC2)
 	{
 		return ERR_MEM_ALLOC;
@@ -1361,7 +1372,8 @@ int GM_SM2Decrypt(unsigned char * DecData, unsigned long * ulDecDataLen, unsigne
 	printf("y2=");
 	BYTE_print(tmpY2Buff, tmpY2Len);
 #endif
-	ptmp = new unsigned char [tmpX2Len * 3];
+	//ptmp = new unsigned char [tmpX2Len * 3];
+	ptmp = malloc(tmpX2Len * 3);
 	if (NULL == ptmp)
 	{
 		ret = ERR_MEM_ALLOC;
@@ -1371,7 +1383,8 @@ int GM_SM2Decrypt(unsigned char * DecData, unsigned long * ulDecDataLen, unsigne
 	memset(ptmp, 0x00 , tmpX2Len * 3);
 	memcpy(ptmp, tmpX2Buff, tmpX2Len);
 	memcpy(ptmp+tmpX2Len, tmpY2Buff, tmpY2Len);
-	pout = new unsigned char [C2_len + 10];
+	//pout = new unsigned char [C2_len + 10];
+	pout = malloc(C2_len + 10);
 	if(NULL == pout)
 	{
 		ret = ERR_MEM_ALLOC;
@@ -1413,9 +1426,11 @@ int GM_SM2Decrypt(unsigned char * DecData, unsigned long * ulDecDataLen, unsigne
 	//  compute C3 = HASH(x2|| M || y2)
 	if (ptmp)
 	{
-		delete []ptmp;
+		//delete []ptmp;
+		free(ptmp);
 	}
-	ptmp = new unsigned char[C2_len + tmpX2Len + tmpY2Len + 100];
+	//ptmp = new unsigned char[C2_len + tmpX2Len + tmpY2Len + 100];
+	ptmp = malloc(C2_len + tmpX2Len + tmpY2Len + 100);
 	if (NULL == ptmp)
 	{
 		ret = ERR_MEM_ALLOC;
@@ -1458,15 +1473,18 @@ int GM_SM2Decrypt(unsigned char * DecData, unsigned long * ulDecDataLen, unsigne
 END:
 	if (ptmp)
 	{
-		delete []ptmp;
+		//delete []ptmp;
+		free(ptmp);
 	}
 	if (pC2)
 	{
-		delete []pC2;
+		//delete []pC2;
+		free(pC2);
 	}
 	if (pout)
 	{
-		delete []pout;
+		//delete []pout;
+		free(pout);
 	}
 
 	mp_clear_multi(&mp_pri_dA, &mp_x1, &mp_y1, &mp_x2, &mp_y2, &mp_Xg, &mp_Yg, &mp_a, &mp_b, &mp_n, &mp_p, NULL);
@@ -1608,7 +1626,8 @@ int GM_SM2Encrypt(unsigned char * encData, unsigned long * ulEncDataLen, unsigne
 		CHECK_RET(ret);
 		ret = Mp_Int2Byte(tmpY2Buff, &tmpY2Len, &mp_y2);
 		CHECK_RET(ret);
-		ptmp = new unsigned char [tmpX2Len * 3];
+		//ptmp = new unsigned char [tmpX2Len * 3];
+		ptmp = malloc(tmpX2Len * 3);
 		if (NULL == ptmp)
 		{
 			ret = ERR_MEM_ALLOC;
@@ -1618,7 +1637,8 @@ int GM_SM2Encrypt(unsigned char * encData, unsigned long * ulEncDataLen, unsigne
 		memset(ptmp, 0x00 , tmpX2Len * 3);
 		memcpy(ptmp, tmpX2Buff, tmpX2Len);
 		memcpy(ptmp+tmpX2Len, tmpY2Buff, tmpY2Len);
-		pout = new unsigned char [plainLen + 10];
+		//pout = new unsigned char [plainLen + 10];
+		pout = malloc(plainLen + 10);
 		if(NULL == pout)
 		{
 			ret = ERR_MEM_ALLOC;
@@ -1648,7 +1668,8 @@ int GM_SM2Encrypt(unsigned char * encData, unsigned long * ulEncDataLen, unsigne
 	} while (1);
 
 	// C2 = M XOR t
-	C2_buf = new unsigned char [plainLen + 10];
+	//C2_buf = new unsigned char [plainLen + 10];
+	C2_buf = malloc(plainLen + 10);
 	if (NULL == C2_buf)
 	{
 		//delete [] C2_buf;
@@ -1672,9 +1693,11 @@ int GM_SM2Encrypt(unsigned char * encData, unsigned long * ulEncDataLen, unsigne
 	//  compute C3 = HASH(x2|| M || y2)
 	if (ptmp)
 	{
-		delete []ptmp;
+		//delete []ptmp;
+		free(ptmp);
 	}
-	ptmp = new unsigned char[plainLen + tmpX2Len + tmpY2Len + 100];
+	//ptmp = new unsigned char[plainLen + tmpX2Len + tmpY2Len + 100];
+	ptmp = malloc(plainLen + tmpX2Len + tmpY2Len + 100);
 	if (NULL == ptmp)
 	{
 		ret = ERR_MEM_ALLOC;
@@ -1722,15 +1745,18 @@ int GM_SM2Encrypt(unsigned char * encData, unsigned long * ulEncDataLen, unsigne
 END:
 	if (ptmp)
 	{
-		delete []ptmp;
+		//delete []ptmp;
+		free(ptmp);
 	}
 	if (pout)
 	{
-		delete []pout;
+		//delete []pout;
+		free(pout);
 	}
 	if (C2_buf)
 	{
-		delete []C2_buf;
+		//delete []C2_buf;
+		free(C2_buf);
 	}
 	
 	mp_clear_multi(&mp_a, &mp_b, &mp_n, &mp_p, 

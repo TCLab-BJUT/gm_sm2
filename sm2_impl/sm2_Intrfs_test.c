@@ -279,7 +279,7 @@ END:
 
 int alloctest()
 {
-	unsigned char * p = new unsigned char [1000];
+	unsigned char * p = malloc(1000);
 	if (NULL == p)
 	{
 		return ERR_MEM_ALLOC;
@@ -287,7 +287,7 @@ int alloctest()
 	memset(p, 0x00, 1000);
 	if (NULL != p)
 	{
-		delete p;
+		free(p);
 	}
 	return 0;
 }
