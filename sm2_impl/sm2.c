@@ -82,7 +82,8 @@ int MP_print(mp_int * mp_num)
 
 void BYTE_print(unsigned char * tar, unsigned long l)
 {
-	for (int i = 0; i<l; i++)
+	int i;
+	for (i = 0; i<l; i++)
 	{
 		if (i %4 ==0)
 		{
@@ -509,10 +510,11 @@ int hexCharStr2unsignedCharStr(char *src, unsigned long lsrc, int flag, unsigned
 		return ERR_HEX2BYTE_PARAM_ERROR;//param err
 	}
 	
+        int i;
 	int j = 0;//index of out buff
 	if(0 == flag)
 	{
-		for (int i=0; i<lsrc; i += 2)
+		for (i=0; i<lsrc; i += 2)
 		{
 			int tmp = 0;
 			int HIGH_HALF_BYTE = 0;
@@ -566,7 +568,7 @@ int hexCharStr2unsignedCharStr(char *src, unsigned long lsrc, int flag, unsigned
 	}
 	else
 	{
-		for (int i=0; i<lsrc; i += 3)
+		for (i=0; i<lsrc; i += 3)
 		{
 			int tmp = 0;
 			int HIGH_HALF_BYTE = 0;
@@ -795,8 +797,9 @@ int Byte2Mp_Int(mp_int * mp_tar, unsigned char *src_byte, unsigned long lenSrc)
 		return ERR_MEM_ALLOC;
 	}
 	memset(src_strbuff, 0x00, lenSrc*2 + MAX_STRLEN);
+	int i;
 	int j = 0, ret = 0;
-	for (int i=0 ; i<lenSrc; i++)
+	for (i=0 ; i<lenSrc; i++)
 	{
 		char tmp = src_byte[i]>>4;
 		if (tmp>=0 && tmp <= 9)
