@@ -649,8 +649,8 @@ END:
 
 /*
  * instruction : sm3 hash with preProcess 
- *               ZA=sm3(ENTL || ID || a || b || xG || yG || xA || yA)
- *               M = sm3(ZA || M)
+ *               ZA=calculate_context_sm3(ENTL || ID || a || b || xG || yG || xA || yA)
+ *               M = calculate_context_sm3(ZA || M)
  * param:
  * @dgst ,@LenDgst : [out] : output hashed data *LenDgst will always return 32
  * @Src ,@lenSrc: [in] : source data to digest
@@ -742,7 +742,7 @@ int Sm3WithPreprocess(unsigned char * dgst, unsigned long * LenDgst,
 	memcpy(ZA_SRC_Buff+Len_ENTL_buf+lenUID+lenParamA+lenParamB+lenParamXg+lenParamYg, uzParam_XA, lenParamXA);
 	memcpy(ZA_SRC_Buff+Len_ENTL_buf+lenUID+lenParamA+lenParamB+lenParamXg+lenParamYg+lenParamXA, uzParam_YA, lenParamYA);
 
-	sm3(ZA_SRC_Buff, lenZA_SRC, ZA);
+	calculate_context_sm3(ZA_SRC_Buff, lenZA_SRC, ZA);
 //	pM_A = new unsigned char[32+lenSrc+MAX_STRLEN];
 	pM_A = malloc(32+lenSrc+MAX_STRLEN);
 	if (NULL == pM_A)
@@ -757,7 +757,7 @@ int Sm3WithPreprocess(unsigned char * dgst, unsigned long * LenDgst,
 	memset(pM_A, 0x00, 32+lenSrc+MAX_STRLEN );
 	memcpy(pM_A, ZA, 32);
 	memcpy(pM_A+32, Src, lenSrc);
-	sm3(pM_A, 32+lenSrc, dgst);
+	calculate_context_sm3(pM_A, 32+lenSrc, dgst);
 	* LenDgst = 32;
 	ret = 0;
 #ifdef _DEBUG
@@ -1153,7 +1153,7 @@ int KDFwithSm3(unsigned char * kdfOutBuff, unsigned char * Z_in, unsigned long u
 		memset(pZ, 0x00 , ulZlen + 4 + 10 );
 		memcpy(pZ, Z_in, ulZlen);
 		memcpy(pZ+ulZlen, ct_un_buff, len_ct_unbuff);
-		sm3(pZ, ulZlen + 4, kdfOutBuff + (ct-1)*32);
+		calculate_context_sm3(pZ, ulZlen + 4, kdfOutBuff + (ct-1)*32);
 	}
 	sprintf(ct_str, "%8lx",ct);
 	ct_len = strlen(ct_str);
@@ -1171,7 +1171,7 @@ int KDFwithSm3(unsigned char * kdfOutBuff, unsigned char * Z_in, unsigned long u
 	memset(pZ, 0x00 , ulZlen + 4 +10 );//??
 	memcpy(pZ, Z_in, ulZlen);
 	memcpy(pZ+ulZlen, ct_un_buff, len_ct_unbuff);
-	sm3(pZ, ulZlen + 4, tmp_buff);
+	calculate_context_sm3(pZ, ulZlen + 4, tmp_buff);
 	memcpy(kdfOutBuff + (ct-1)*32, tmp_buff, mod);
 	ret = 0;
 
@@ -1444,7 +1444,7 @@ int GM_SM2Decrypt(unsigned char * DecData, unsigned long * ulDecDataLen, unsigne
 	memcpy(ptmp+tmpX2Len, pC2, C2_len);
 	memcpy(ptmp+tmpX2Len+C2_len, tmpY2Buff, tmpY2Len);
 	
-	sm3(ptmp, tmpX2Len+C2_len+tmpY2Len, dgstC3);
+	calculate_context_sm3(ptmp, tmpX2Len+C2_len+tmpY2Len, dgstC3);
 	if (0 != memcmp(C3, dgstC3, 32))
 	{
 		ret = ERR_DECRYPTION_FAILED;
@@ -1711,7 +1711,7 @@ int GM_SM2Encrypt(unsigned char * encData, unsigned long * ulEncDataLen, unsigne
 	memcpy(ptmp+tmpX2Len, plain, plainLen);
 	memcpy(ptmp+tmpX2Len+plainLen, tmpY2Buff, tmpY2Len);
 
-	sm3(ptmp, tmpX2Len+plainLen+tmpY2Len, C3_buf);
+	calculate_context_sm3(ptmp, tmpX2Len+plainLen+tmpY2Len, C3_buf);
 
 
 #ifdef _DEBUG

@@ -1,120 +1,66 @@
-/**
- * \file sm3.h
- * thanks to Xyssl
- * SM3 standards:http://www.oscca.gov.cn/News/201012/News_1199.htm
- * author:goldboar
- * email:goldboar@163.com
- * 2011-10-26
- */
-#ifndef XYSSL_SM3_H_CCC3C7AE_9547_4BAB_B844_A0BB22B281E3___
-#define XYSSL_SM3_H_CCC3C7AE_9547_4BAB_B844_A0BB22B281E3___
+/*writen by tjs in 2011-4-19*/
 
+#ifndef _SM3_
+#define _SM3_
 
-/**
- * \brief          SM3 context structure
- */
+#ifndef CUBE_DATA_TYPE_H
+typedef unsigned char         BYTE;
+typedef unsigned short int  UINT16;
+typedef unsigned int        UINT32;
+typedef unsigned long int   UINT64;
+#endif 
+
+//#define DEBUG
+
 typedef struct
 {
-    unsigned long total[2];     /*!< number of bytes processed  */
-    unsigned long state[8];     /*!< intermediate digest state  */
-    unsigned char buffer[64];   /*!< data block being processed */
+  UINT32 total_bytes_High;
+  UINT32 total_bytes_Low;
+  UINT32 vector[8];
+  BYTE  buffer[64];     // 64 byte buffer
 
-    unsigned char ipad[64];     /*!< HMAC: inner padding        */
-    unsigned char opad[64];     /*!< HMAC: outer padding        */
+  BYTE ipad[64];       // HMAC: inner padding
+  BYTE opad[64];       // HMAC: outer padding	
+  
+} SM3_context;
 
+
+#define rol(x,n) ((x << n) | ((x & 0xFFFFFFFF) >> (32 - n)))
+/*
+inline int rol(UINT32 operand, BYTE width){ 
+	 asm volatile("rol %%cl, %%eax" 
+               : "=a" (operand) 
+               : "a" (operand), "c" (width) 
+               ); 
 }
-sm3_context;
+*/
+#define P0(x) ((x^(rol(x,9))^(rol(x,17))))
+#define P1(x) ((x^(rol(x,15))^(rol(x,23))))
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-/**
- * \brief          SM3 context setup
- *
- * \param ctx      context to be initialized
- */
-void sm3_starts( sm3_context *ctx );
-
-/**
- * \brief          SM3 process buffer
- *
- * \param ctx      SM3 context
- * \param input    buffer holding the  data
- * \param ilen     length of the input data
- */
-void sm3_update( sm3_context *ctx, unsigned char *input, int ilen );
-
-/**
- * \brief          SM3 final digest
- *
- * \param ctx      SM3 context
- */
-void sm3_finish( sm3_context *ctx, unsigned char output[32] );
-
-/**
- * \brief          Output = SM3( input buffer )
- *
- * \param input    buffer holding the  data
- * \param ilen     length of the input data
- * \param output   SM3 checksum result
- */
-void sm3( unsigned char *input, int ilen,
-           unsigned char output[32]);
-
-/**
- * \brief          Output = SM3( file contents )
- *
- * \param path     input file name
- * \param output   SM3 checksum result
- *
- * \return         0 if successful, 1 if fopen failed,
- *                 or 2 if fread failed
- */
-int sm3_file( char *path, unsigned char output[32] );
-
-/**
- * \brief          SM3 HMAC context setup
- *
- * \param ctx      HMAC context to be initialized
- * \param key      HMAC secret key
- * \param keylen   length of the HMAC key
- */
-void sm3_hmac_starts( sm3_context *ctx, unsigned char *key, int keylen);
-
-/**
- * \brief          SM3 HMAC process buffer
- *
- * \param ctx      HMAC context
- * \param input    buffer holding the  data
- * \param ilen     length of the input data
- */
-void sm3_hmac_update( sm3_context *ctx, unsigned char *input, int ilen );
-
-/**
- * \brief          SM3 HMAC final digest
- *
- * \param ctx      HMAC context
- * \param output   SM3 HMAC checksum result
- */
-void sm3_hmac_finish( sm3_context *ctx, unsigned char output[32] );
-
-/**
- * \brief          Output = HMAC-SM3( hmac key, input buffer )
- *
- * \param key      HMAC secret key
- * \param keylen   length of the HMAC key
- * \param input    buffer holding the  data
- * \param ilen     length of the input data
- * \param output   HMAC-SM3 result
- */
-void sm3_hmac( unsigned char *key, int keylen,
-                unsigned char *input, int ilen,
-                unsigned char output[32] );
-
-
-#ifdef __cplusplus
+#define CONCAT_4_BYTES( w32, w8, w8_i)            \
+{                                                 \
+    (w32) = ( (UINT32) (w8)[(w8_i)    ] << 24 ) |  \
+            ( (UINT32) (w8)[(w8_i) + 1] << 16 ) |  \
+            ( (UINT32) (w8)[(w8_i) + 2] <<  8 ) |  \
+            ( (UINT32) (w8)[(w8_i) + 3]       );   \
 }
-#endif
 
-#endif /* sm3.h */
+#define SPLIT_INTO_4_BYTES( w32, w8, w8_i)        \
+{                                                 \
+    (w8)[(w8_i)] = (BYTE) ( (w32) >> 24 );    \
+    (w8)[(w8_i) + 1] = (BYTE) ( (w32) >> 16 );    \
+    (w8)[(w8_i) + 2] = (BYTE) ( (w32) >>  8 );    \
+    (w8)[(w8_i) + 3] = (BYTE) ( (w32)       );    \
+}
+
+static BYTE SM3_padding[64] =
+{
+ (BYTE) 0x80, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0,
+ (BYTE)    0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0,
+ (BYTE)    0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0,
+ (BYTE)    0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0, (BYTE) 0
+};
+
+int calculate_context_sm3(char* context, int context_size, UINT32 *SM3_hash);
+
+#endif

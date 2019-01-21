@@ -1,7 +1,7 @@
 
 
 LIBNAME=libsm2So.so
-OBJECTS=sm2.o sm3.o sm2_Intrfs_test.o
+OBJECTS=sm2.o
 CC=gcc
 CPP=g++
 
@@ -12,6 +12,7 @@ all: $(LIBNAME)
 
 $(LIBNAME):  $(OBJECTS)
 	$(CC) $(CFLAGS)  $(OBJECTS) ../libtommath-0.42.0/libtommath.a -shared -o $(LIBNAME) -ldl
+	
 
 .cpp.o:
 	$(CC) $(CFLAGS) $< -o $@ -c
