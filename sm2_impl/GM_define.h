@@ -8,7 +8,7 @@
 
 typedef  unsigned long ULONG;
 typedef  char          CHAR;
-typedef  unsigned char BYTE;
+//typedef  unsigned char BYTE;
 
 
 #define MAX_IV_LEN			32		//初始化向量的最大长度
